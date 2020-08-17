@@ -1,41 +1,23 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { createStore, compose } from 'redux';
+import { Provider } from 'react-redux';
+import App from './App';
+import { reducers } from './reducers'
 
-interface AppProps {
-    color: string;
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+  }
 }
 
-interface AppState {
-    counter: number;
-}
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-class App extends React.Component<AppProps, AppState> {
-    //state = { counter: 0 }  # we define state of App class we are not override state in React.Component
+const store = createStore(reducers, composeEnhancers());
 
-    constructor(props: AppProps){
-        super(props)
-        //overriding state in Component class
-        this.state = {counter: 0}
-    }
-
-    onIncrement = (): void => {
-        this.setState((prevState: AppState)=>({ counter: prevState.counter + 1 }))
-    }
-
-    onDecrement = (): void => {
-        this.setState((prevState: AppState)=>({ counter: prevState.counter -1 }))
-    }
-
-    public render() {
-        return(
-            <div>
-                {this.state.counter}
-                <button onClick={this.onIncrement}>Increment</button>
-                <button onClick={this.onDecrement}>Decrement</button>
-            </div>
-        )
-    }
-}
-
-
-ReactDOM.render(<App color="red"/>, document.querySelector("#root"))
+ReactDOM.render(
+	<Provider store={store}>
+		<App />
+	</Provider>,
+	document.querySelector('#root')
+);
