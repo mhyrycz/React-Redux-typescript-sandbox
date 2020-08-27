@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Todo, fetchTodos } from './actions';
+import { Todo, fetchTodos, deleteTodo } from './actions';
 import { StoreState } from './reducers';
 
 interface AppProps {
 	todos: Todo[];
-	fetchTodos(): any;
+	fetchTodos: Function; // there is no easy way to say that fetchTodos is thunk (types definition files)
+	deleteTodo: typeof deleteTodo;
 }
 
 class App extends React.Component<AppProps> {
@@ -19,9 +20,17 @@ class App extends React.Component<AppProps> {
 		this.props.fetchTodos();
 	};
 
+	onTodoClick = (id: number): void => {
+		this.props.deleteTodo(id);
+	};
+
 	renderList(): JSX.Element[] {
 		return this.props.todos.map((todo: Todo) => {
-			return <div>{todo.title}</div>;
+			return (
+				<div onClick={() => this.onTodoClick(todo.id)} key={todo.id}>
+					{todo.title}
+				</div>
+			);
 		});
 	}
 
@@ -41,7 +50,8 @@ const mapStateToProps = (state: StoreState) => {
 };
 
 const mapDispatchToProps = () => ({
-	fetchTodos
+	fetchTodos,
+	deleteTodo
 });
 
 export default connect(mapStateToProps, mapDispatchToProps())(App);
