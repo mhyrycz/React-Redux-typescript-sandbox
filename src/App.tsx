@@ -9,15 +9,35 @@ interface AppProps {
 	deleteTodo: typeof deleteTodo;
 }
 
-class App extends React.Component<AppProps> {
+interface AppState {
+	fetching: boolean;
+}
+
+class App extends React.Component<AppProps, AppState> {
+	constructor(props: AppProps) {
+		super(props);
+		this.state = { fetching: false };
+	}
+
+	//state = { fetching: false } -> this is correct way too. Overriding state of parent class.
+
 	//Both ways are correct
 	// onButtonClick(): void {
 	//     console.log(this.props)
 	//     this.props.fetchTodos();
 	// }
 
+	componentDidUpdate(prevProps: AppProps) {
+		// !prevProps.todos.length => prevProps.todos.length === 0
+		// this.props.todos.length => this.props.todos.length > 0
+		if (!prevProps.todos.length && this.props.todos.length) {
+			this.setState({ fetching: false });
+		}
+	}
+
 	onButtonClick = (): void => {
 		this.props.fetchTodos();
+		this.setState({ fetching: true });
 	};
 
 	onTodoClick = (id: number): void => {
@@ -39,6 +59,8 @@ class App extends React.Component<AppProps> {
 			<div>
 				<button onClick={this.onButtonClick}>Fetch </button>
 				{/* <button onClick={()=>{this.onButtonClick()}}>Fetch </button> */}
+				{console.log(this.state.fetching)}
+				{this.state.fetching ? 'Loading' : null}
 				{this.renderList()}
 			</div>
 		);
